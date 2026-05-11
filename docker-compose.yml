@@ -12,7 +12,8 @@ services:
       - db_data:/var/lib/mysql
 
   api-ventas:
-    build: ./back-Ventas_SpringBoot/Springboot-API-REST
+    # AQUI: Reemplaza TU_USUARIO_DOCKER por tu usuario de Docker Hub
+    image: vicenteoyarzun/api-ventas:latest
     container_name: api-ventas
     ports:
       - "8080:8080"
@@ -26,7 +27,8 @@ services:
       - db
 
   api-despachos:
-    build: ./back-Despachos_SpringBoot/Springboot-API-REST-DESPACHO
+    # AQUI: Reemplaza TU_USUARIO_DOCKER por tu usuario de Docker Hub
+    image: vicenteoyarzun/api-despachos:latest
     container_name: api-despachos
     ports:
       - "8081:8081"
