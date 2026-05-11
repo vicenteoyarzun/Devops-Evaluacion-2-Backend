@@ -8,17 +8,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout código
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Desplegar en EC2 Backend mediante Docker Compose
+      - name: Desplegar en EC2 Backend
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.EC2_BACKEND_IP }}
           username: ec2-user
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            # Clona o actualiza el repo directamente en la EC2 (Asegúrate de que la EC2 tenga acceso a git o usa el método de copia)
-            cd ~/devops-evaluacion-2-backend || git clone -b deploy https://github.com/TU_USUARIO/devops-evaluacion-2-backend.git ~/devops-evaluacion-2-backend
+            # 1. Borramos la carpeta antigua para que no haya conflictos
+            rm -rf ~/devops-evaluacion-2-backend
+            
+            # 2. Clonamos con la variable magica de GitHub (no necesitas configurar este secreto, viene por defecto)
+            git clone -b deploy https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git ~/devops-evaluacion-2-backend
+            
+            # 3. Entramos a la carpeta
             cd ~/devops-evaluacion-2-backend
-            git pull origin deploy
-            sudo docker compose up -d --build
+            
+            # 4. Levantamos los contenedores usando docker-compose CON GUION
+            sudo docker-compose down || true
+            sudo docker-compose up -d --build
