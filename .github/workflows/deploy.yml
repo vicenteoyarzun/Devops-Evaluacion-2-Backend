@@ -41,12 +41,11 @@ jobs:
           username: ec2-user
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            # 1. Limpiamos y clonamos el repositorio
+
             rm -rf ~/devops-evaluacion-2-backend
             git clone -b deploy https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git ~/devops-evaluacion-2-backend
             cd ~/devops-evaluacion-2-backend
             
-            # 2. Descargamos las imágenes nuevas desde Docker Hub y levantamos
             sudo docker-compose pull
             sudo docker-compose down || true
             sudo docker-compose up -d
