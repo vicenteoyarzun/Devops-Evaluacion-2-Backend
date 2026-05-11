@@ -12,7 +12,6 @@ services:
       - db_data:/var/lib/mysql
 
   api-ventas:
-    # AQUI: Reemplaza TU_USUARIO_DOCKER por tu usuario de Docker Hub
     image: vicenteoyarzun/api-ventas:latest
     container_name: api-ventas
     ports:
@@ -27,7 +26,6 @@ services:
       - db
 
   api-despachos:
-    # AQUI: Reemplaza TU_USUARIO_DOCKER por tu usuario de Docker Hub
     image: vicenteoyarzun/api-despachos:latest
     container_name: api-despachos
     ports:
