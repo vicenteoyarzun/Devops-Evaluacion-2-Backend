@@ -1,0 +1,43 @@
+version: '3.8'
+services:
+  db:
+    image: mysql:8.0
+    container_name: db-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: db_sistema
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+  api-ventas:
+    build: ./back-Ventas_SpringBoot/Springboot-API-REST
+    container_name: api-ventas
+    ports:
+      - "8080:8080"
+    environment:
+      DB_ENDPOINT: db
+      DB_PORT: 3306
+      DB_NAME: db_sistema
+      DB_USERNAME: root
+      DB_PASSWORD: admin
+    depends_on:
+      - db
+
+  api-despachos:
+    build: ./back-Despachos_SpringBoot/Springboot-API-REST-DESPACHO
+    container_name: api-despachos
+    ports:
+      - "8081:8081"
+    environment:
+      DB_ENDPOINT: db
+      DB_PORT: 3306
+      DB_NAME: db_sistema
+      DB_USERNAME: root
+      DB_PASSWORD: admin
+    depends_on:
+      - db
+
+volumes:
+  db_data:
