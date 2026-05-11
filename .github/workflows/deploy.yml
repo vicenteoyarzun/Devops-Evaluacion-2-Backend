@@ -4,12 +4,36 @@ on:
     branches: [ "deploy" ]
 
 jobs:
-  deploy-to-ec2:
+  build-and-push:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout código
         uses: actions/checkout@v4
 
+      - name: Login DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and Push API Ventas
+        uses: docker/build-push-action@v5
+        with:
+          context: ./back-Ventas_SpringBoot/Springboot-API-REST
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/api-ventas:latest
+
+      - name: Build and Push API Despachos
+        uses: docker/build-push-action@v5
+        with:
+          context: ./back-Despachos_SpringBoot/Springboot-API-REST-DESPACHO
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/api-despachos:latest
+
+  deploy-to-ec2:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
       - name: Desplegar en EC2 Backend
         uses: appleboy/ssh-action@master
         with:
@@ -17,15 +41,12 @@ jobs:
           username: ec2-user
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            # 1. Borramos la carpeta antigua para que no haya conflictos
+            # 1. Limpiamos y clonamos el repositorio
             rm -rf ~/devops-evaluacion-2-backend
-            
-            # 2. Clonamos con la variable magica de GitHub (no necesitas configurar este secreto, viene por defecto)
             git clone -b deploy https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git ~/devops-evaluacion-2-backend
-            
-            # 3. Entramos a la carpeta
             cd ~/devops-evaluacion-2-backend
             
-            # 4. Levantamos los contenedores usando docker-compose CON GUION
+            # 2. Descargamos las imágenes nuevas desde Docker Hub y levantamos
+            sudo docker-compose pull
             sudo docker-compose down || true
-            sudo docker-compose up -d --build
+            sudo docker-compose up -d
